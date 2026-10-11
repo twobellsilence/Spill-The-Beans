@@ -1,8 +1,9 @@
+import { additions, preschool } from './expansion.js';
 // Original editorial content. A = all ages; K = kids+; T = tweens+;
 // N = teens+; U = adults. Work suffixes select a particular context.
 // Friends: L = laughs, B = balanced, D = deep. Stable IDs preserve saved cards.
 export const modes = {
-  family: { name: 'Family Time', icon: '🏡', color: 'sage', description: 'Little ones, big stories. Bring every generation to the table.', invitation: 'Make a little family magic', filterLabel: 'Who’s joining?', filters: [['all','All Ages'],['kids','Kids (5–9)'],['tweens','Tweens (10–12)'],['teens','Teens (13–17)'],['adults','Adults']], categories: [['laugh','😂','Laugh Out Loud','A little silly. A lot of laughter.'],['imagine','💭','Imagine That!','Let your imagination wander.'],['heart','❤️','Heart to Heart','Small questions, closer connections.'],['stories','📖','Family Stories','The stories only your family can tell.'],['big','🌎','Big Questions','Explore the world together.'],['faith','✝️','Faith & Values','Christian reflections, chosen by you.']] },
+  family: { name: 'Family Time', icon: '🏡', color: 'sage', description: 'Little ones, big stories. Bring every generation to the table.', invitation: 'Make a little family magic', filterLabel: 'Who’s joining?', filters: [['little','Little Ones (4 & Under) 🧸'],['kids','Kids (5–9)'],['tweens','Tweens (10–12)'],['teens','Teens (13–17)'],['adults','Adults'],['all','All Ages']], categories: [['laugh','😂','Laugh Out Loud','A little silly. A lot of laughter.'],['imagine','💭','Imagine That!','Let your imagination wander.'],['heart','❤️','Heart to Heart','Small questions, closer connections.'],['stories','📖','Family Stories','The stories only your family can tell.'],['big','🌎','Big Questions','Explore the world together.'],['faith','✝️','Faith & Values','Christian reflections, chosen by you.']] },
   friends: { name: 'Friends & Gatherings', icon: '🎉', color: 'coral', description: 'Old friends, new discoveries. Turn “how’ve you been?” into more.', invitation: 'Find your next conversation', filterLabel: 'Set the mood', filters: [['laughs','Just for Laughs'],['both','A Little of Both'],['deep','Let’s Go Deep']], categories: [['rather','⚖️','Would You Rather?','Two choices. Plenty to talk about.'],['debates','🤣','Ridiculous Debates','Strong opinions, wonderfully low stakes.'],['whatif','🚀','What If?','Leave ordinary at the door.'],['confessions','🤭','Confessions & Surprises','The little things nobody would guess.'],['deep','🌙','Deep Conversations','Take the conversation a little further.'],['memories','📸','Throwbacks & Memories','Good stories deserve another telling.']] },
   work: { name: 'Work & Teams', icon: '💼', color: 'blue', description: 'Meet the people behind the job titles. A little connection goes a long way.', invitation: 'Bring your team together', filterLabel: 'What’s the setting?', filters: [['all','All Work Settings'],['new','New Teams'],['established','Established Teams'],['retreat','Team Retreats'],['leadership','Leadership Groups']], categories: [['ice','🧊','Quick Icebreakers','An easy way to say hello.'],['laugh','😄','Laugh Together','Give the meeting a lighter moment.'],['know','👋','Get to Know You','Discover the person behind the role.'],['connect','🤝','Team Connections','Build understanding, one question at a time.'],['grow','🌱','Reflect & Grow','Make room for learning.'],['future','🚀','Future Possibilities','A little space for big ideas.']] }
 };
@@ -374,10 +375,17 @@ leadership|What should we keep asking as our tools and plans evolve?
 leadership|How could we make a promising experiment easy to begin and safe to learn from?`
 }
 };
-const ages = {A:['all','kids','tweens','teens','adults'], K:['kids','tweens','teens','adults'], T:['tweens','teens','adults'], N:['teens','adults'], U:['adults']};
+for (const [mode, categories] of Object.entries(bank)) {
+  for (const category of Object.keys(categories)) {
+    categories[category] += '\n' + additions[mode][category];
+    if (mode === 'family') categories[category] += '\n' + preschool[category];
+  }
+}
+const ages = {P:['little'], A:['all','kids','tweens','teens','adults'], K:['kids','tweens','teens','adults'], T:['tweens','teens','adults'], N:['teens','adults'], U:['adults']};
 export const questions = Object.entries(bank).flatMap(([mode, categories]) => Object.entries(categories).flatMap(([category, lines]) => lines.split('\n').map((line, i) => {
   const [marker, text] = line.split('|');
   return {id:`${mode}-${category}-${String(i + 1).padStart(2,'0')}`, mode, category, text, ages: mode === 'family' ? ages[marker] : [], depth: mode === 'friends' ? {L:'laughs',B:'both',D:'deep'}[marker] : null, contexts: mode === 'work' ? [marker] : [], broad: mode === 'family' ? marker === 'A' && category !== 'faith' : mode === 'friends' ? marker === 'L' || marker === 'B' : marker === 'all' && ['ice','laugh','know','future'].includes(category)};
 })));
 export const questionById = new Map(questions.map(q => [q.id,q]));
 export function categoryInfo(q) { return modes[q.mode].categories.find(c => c[0] === q.category); }
+

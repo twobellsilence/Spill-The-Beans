@@ -6,9 +6,9 @@ A conversation starter app for families, friends and workplace teams.
 
 ## Your first release
 
-360 original questions, written for conversations rather than quizzes. Choose Family Time, Friends & Gatherings or Work & Teams, pick a category and audience, then start talking. There are 120 questions per mode and 20 per category.
+840 original questions, written for conversations rather than quizzes. Choose Family Time, Friends & Gatherings or Work & Teams, pick a category and audience, then start talking. Family Time has 360 questions (60 per category, including 20 dedicated preschool prompts); Friends and Work each have 240 (40 per category).
 
-- Family ages: Kids (5–9), Tweens (10–12), Teens (13–17), Adults and All Ages. All Ages uses prompts suitable for a mixed-age group; specific age filters also include those shared prompts.
+- Family ages: Little Ones (4 & Under) 🧸, Kids (5–9), Tweens (10–12), Teens (13–17), Adults and All Ages. Little Ones uses short prompts that adults can read aloud, with pointing, sounds and actions welcome. All Ages uses multigenerational prompts; older age filters also include those shared prompts. Dedicated preschool cards stay in Little Ones.
 - Friends: Just for Laughs, A Little of Both (all depths), or Let’s Go Deep.
 - Work: New Teams, Established Teams, Team Retreats, Leadership Groups and All Work Settings. Universal work prompts are available in each specific setting.
 - Optional Christian Faith & Values cards appear **only when that category is explicitly chosen**. All Categories and home Surprise Me never include them.
@@ -65,6 +65,7 @@ npm run preview
 Open http://localhost:4173/Spill-The-Beans/ to preview the production build. `npm run dev` serves the source with the same URL. Stop the server with Ctrl+C. Opening `index.html` by double-clicking is not supported because browsers restrict JavaScript modules on file URLs.
 
 - `src/questions.js`: locally stored question bank, mode/category descriptions and audience metadata. Keep IDs stable to preserve favourites.
+- `src/expansion.js`: 360 additional general prompts and 120 preschool prompts, appended with stable IDs.
 - `src/core.js`: eligibility, rotation, storage validation and sharing logic.
 - `src/app.js`: screen rendering and accessible interactions.
 - `src/styles.css`: mobile-first styling, visible focus and reduced-motion support.
@@ -72,6 +73,7 @@ Open http://localhost:4173/Spill-The-Beans/ to preview the production build. `np
 - `sw.js`: offline app-shell caching, scoped to this site.
 - `scripts/build.mjs`: validates question counts and writes the production files to `dist/`. The service worker receives a content fingerprint on every build so changes refresh its cache.
 - `.github/workflows/deploy.yml`: tests pull requests; tests, builds and deploys `main` to Pages.
+- `tests/expansion.test.js`: preschool coverage, metadata, normalized uniqueness, original-ID persistence and seasonal distribution checks.
 - `tests/core.test.js`: automated bank, filter, rotation, persistence, sharing and deployment checks.
 - `QA.md`: the validation performed for this release, including limits.
 
@@ -80,3 +82,4 @@ All asset links, the manifest and service worker use relative URLs. This support
 ## Privacy and limits
 
 Your history, preferences and favourites are saved only in this browser. If storage is denied, corrupted or full, the app keeps working in memory and explains that saving may be unavailable. No data leaves the app unless you choose to share a question. Device sharing may show other apps, depending on your browser. This release has no account, export/import or cross-device syncing.
+

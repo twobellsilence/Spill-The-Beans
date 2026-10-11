@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {questions,modes,questionById} from '../src/questions.js';
 import {eligible,unseen,pick,record,toggleFavourite,resetPool,defaults,sanitize,loadState,saveState,shareQuestion,shareUrl,STORAGE_KEY} from '../src/core.js';
-test('360 distinct original cards, 120 per mode and 20 per category',()=>{
-  assert.equal(questions.length,360);assert.equal(new Set(questions.map(q=>q.text.toLowerCase())).size,360);assert.equal(questionById.size,360);
-  for(const [mode,m] of Object.entries(modes)){assert.equal(questions.filter(q=>q.mode===mode).length,120);for(const [c] of m.categories)assert.equal(questions.filter(q=>q.mode===mode&&q.category===c).length,20);}
+test('840 distinct cards, all categories doubled plus preschool coverage',()=>{
+  assert.equal(questions.length,840);assert.equal(new Set(questions.map(q=>q.text.toLowerCase())).size,840);assert.equal(questionById.size,840);
+  for(const [mode,m] of Object.entries(modes)){assert.equal(questions.filter(q=>q.mode===mode).length,mode==='family'?360:240);for(const [c] of m.categories)assert.equal(questions.filter(q=>q.mode===mode&&q.category===c).length,mode==='family'?60:40);}
 });
 test('Every audience/category combination has eligible questions with correct metadata',()=>{
   for(const [mode,m] of Object.entries(modes))for(const [filter] of m.filters)for(const category of ['all',...m.categories.map(c=>c[0])]){
@@ -19,7 +19,7 @@ test('Faith is explicit opt-in; home Surprise Me is broad',()=>{
   assert.ok(eligible({mode:'surprise'}).every(q=>q.broad));assert.deepEqual(new Set(eligible({mode:'surprise'}).map(q=>q.mode)),new Set(['family','friends','work']));
 });
 test('Every family category includes younger-child and older-specific material',()=>{
-  for(const [category] of modes.family.categories){const all=eligible({mode:'family',category,filter:'all'});const kids=eligible({mode:'family',category,filter:'kids'});const adults=eligible({mode:'family',category,filter:'adults'});assert.equal(all.length,12);assert.equal(kids.length,14);assert.equal(adults.length,20);}
+  for(const [category] of modes.family.categories){const all=eligible({mode:'family',category,filter:'all'});const kids=eligible({mode:'family',category,filter:'kids'});const adults=eligible({mode:'family',category,filter:'adults'});assert.equal(all.length,24);assert.equal(kids.length,28);assert.equal(adults.length,40);}
 });
 test('Random rotation exhausts without repeats, remembers overlap and supports pool reset',()=>{
   const state=defaults();const pool=eligible({mode:'family',filter:'kids'});let prior=null;
@@ -66,3 +66,4 @@ test('Manifest and service worker use relative URLs; deployment builds and tests
 test('Local PNG icons include correct dimensions and maskable artwork',async()=>{
   for(const [name,size] of [['icon-192.png',192],['icon-512.png',512],['icon-maskable.png',512]]) { const png=await readFile(`public/${name}`);assert.equal(png.subarray(1,4).toString(),'PNG');assert.equal(png.readUInt32BE(16),size);assert.equal(png.readUInt32BE(20),size); }
 });
+

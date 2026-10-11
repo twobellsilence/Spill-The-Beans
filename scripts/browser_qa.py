@@ -28,7 +28,7 @@ with sync_playwright() as p:
   page.goto(BASE+'#history');no_overflow(page,f'history {width}')
  passed('No horizontal overflow at 320, 375, 390, 414, 768 and 1440 px across five screens')
  page.set_viewport_size({'width':390,'height':844});page.goto(BASE+'#home');page.wait_for_timeout(300);page.screenshot(path=str(OUT/'home-mobile.png'),full_page=True)
- for mode,filters in [('family',['all','kids','tweens','teens','adults']),('friends',['laughs','both','deep']),('work',['all','new','established','retreat','leadership'])]:
+ for mode,filters in [('family',['all','little','kids','tweens','teens','adults']),('friends',['laughs','both','deep']),('work',['all','new','established','retreat','leadership'])]:
   for filter in filters:
    page.goto(BASE+f'#mode/{mode}')
    page.locator(f'[data-action="category"][data-value="all"]').click()
@@ -40,7 +40,25 @@ with sync_playwright() as p:
    page.locator(f'[data-action="filter"][data-value="{filters[0]}"]').click()
    page.locator(f'[data-action="category"][data-value="{category}"]').click()
    page.get_by_role('button',name='Let’s talk').click();page.locator('#question-text').wait_for()
- passed('All three modes, 18 categories and 13 audience options work through the UI')
+ passed('All three modes, 18 categories and 14 audience options work through the UI')
+ # Use a clean profile with original saved IDs, as an existing user would have.
+ little_context=browser.new_context(viewport={'width':390,'height':844})
+ little_context.add_init_script("""if(!localStorage.getItem('spill-the-beans-v1'))localStorage.setItem('spill-the-beans-v1',JSON.stringify({version:1,favourites:['family-laugh-01'],history:[{id:'work-ice-01',at:123}],seen:['work-ice-01'],preferences:{family:{category:'laugh',filter:'little'},friends:{category:'all',filter:'both'},work:{category:'all',filter:'all'}}}));""")
+ lp=little_context.new_page();lp.goto(BASE+'#mode/family')
+ assert lp.locator('[data-value="little"]').get_attribute('aria-pressed')=='true'
+ for category in ['laugh','imagine','heart','stories','big','faith']:
+  lp.goto(BASE+'#mode/family');lp.locator(f'[data-action="category"][data-value="{category}"]').click()
+  lp.get_by_role('button',name='Surprise Me').click();lp.locator('#question-text').wait_for()
+  no_overflow(lp,'preschool '+category)
+  qid=lp.locator('[data-action="favourite"]').get_attribute('data-id')
+  assert qid.startswith('family-'+category+'-') and 41<=int(qid.rsplit('-',1)[1])<=60
+ lp.goto(BASE+'#mode/family');lp.locator('[data-action="category"][data-value="all"]').click()
+ assert '100 questions' in lp.locator('.start-row').inner_text()
+ lp.reload();assert lp.locator('[data-value="little"]').get_attribute('aria-pressed')=='true'
+ lp.goto(BASE+'#favourites');assert lp.locator('[data-id="family-laugh-01"]').count()>0
+ lp.goto(BASE+'#history');assert lp.locator('[data-id="work-ice-01"]').count()>0
+ little_context.close()
+ passed('Little Ones works with all six categories and contextual Surprise Me; original saved IDs survive')
  page.goto(BASE+'#home');page.get_by_role('button',name='Surprise Me').click();page.locator('#question-text').wait_for()
  for _ in range(15):
   assert 'Faith & Values' not in page.locator('.question-card-label').inner_text()
@@ -63,13 +81,13 @@ with sync_playwright() as p:
  assert page.locator('[data-value="kids"]').get_attribute('aria-pressed')=='true'
  page.get_by_role('button',name='Let’s talk').click()
  texts=set()
- for i in range(14):
+ for i in range(28):
   current=page.locator('#question-text').inner_text();assert current not in texts;texts.add(current)
-  if i<13:page.get_by_role('button',name='Next Question').click()
+  if i<27:page.get_by_role('button',name='Next Question').click()
  page.get_by_role('button',name='Finish this selection').click();expect(page.get_by_role('heading',name='You’ve spilled every bean.')).to_have_count(1)
  page.reload();expect(page.get_by_role('heading',name='You’ve spilled every bean.')).to_have_count(1)
  page.get_by_role('button',name='Reshuffle this selection').click();page.locator('#question-text').wait_for()
- passed('14-card pool exhausts without repeats across reload and reshuffles explicitly')
+ passed('28-card pool exhausts without repeats across reload and reshuffles explicitly')
  # Force the selectable-text fallback without relying on machine clipboard capabilities.
  page.evaluate("Object.defineProperty(navigator,'share',{value:undefined,configurable:true}); Object.defineProperty(navigator,'clipboard',{value:undefined,configurable:true})")
  page.get_by_role('button',name='Share question',exact=True).click();page.locator('.share-copy').wait_for();assert '#question/' in page.locator('.share-copy').input_value()
@@ -87,6 +105,7 @@ with sync_playwright() as p:
  page.evaluate('navigator.serviceWorker.ready.then(() => true)')
  page.wait_for_function('navigator.serviceWorker.controller !== null')
  assert page.evaluate("caches.keys().then(keys=>keys.some(k=>k.startsWith('spill-the-beans-')))")
+ assert page.evaluate("caches.match(new URL('src/expansion.js',location.href)).then(r=>!!r)")
  context.set_offline(True);page.reload();page.locator('#question-text').wait_for();page.get_by_role('button',name='Next Question').click();page.locator('#question-text').wait_for()
  page.goto(BASE+'#mode/friends');page.get_by_role('button',name='Let’s talk').click();page.locator('#question-text').wait_for()
  context.set_offline(False)
@@ -104,3 +123,4 @@ with sync_playwright() as p:
  browser.close()
 (OUT/'browser-results.json').write_text(json.dumps({'passed':results,'runtime_errors':errors},indent=2))
 print(f'{len(results)} browser checks passed.',flush=True)
+

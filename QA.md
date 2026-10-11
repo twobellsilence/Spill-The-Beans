@@ -1,3 +1,7 @@
+# Latest expansion validation
+
+See [EXPANSION_QA.md](EXPANSION_QA.md) for the 840-question release and preschool filter validation. The report below records the original 360-question release.
+
 # Release validation
 
 Validated on 11 October 2026. Tests were run against the production build at `/Spill-The-Beans/`, with additional checks at the domain root.
@@ -59,3 +63,4 @@ The script uses an installed `chromium` if available, otherwise Playwright’s C
 - Accessibility checks covered semantic elements, labels, focus, keyboard operation, dialog behavior, reduced-motion CSS and overflow. No screen-reader session or formal accessibility audit was performed.
 - GitHub Pages configuration was reviewed. The production website is not live until the pull request is merged and the repository owner enables GitHub Actions as the Pages source. A live deployment must be confirmed by its green deploy job and returned URL.
 - Offline use needs a successful online visit. Browser storage and caches can be cleared or evicted by the device; collections do not sync between devices.
+

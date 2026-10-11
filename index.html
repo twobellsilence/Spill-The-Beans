@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#faf7ef">
+  <meta name="description" content="360 thoughtful, playful conversation starters for families, friends and teams. No accounts. Just good conversations.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Spill the Beans">
+  <title>Spill the Beans 🫘 — Good conversations start here.</title>
+  <link rel="icon" href="./public/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./public/icon-192.png">
+  <link rel="manifest" href="./public/manifest.webmanifest">
+  <link rel="stylesheet" href="./src/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to conversation</a>
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="Spill the Beans home"><span class="brand-bean" aria-hidden="true">🫘</span><span>spill the beans<span class="brand-dot">.</span></span></a>
+    <nav aria-label="Main navigation"><a href="#home" data-nav="home">⌂ <span>Explore</span></a><a href="#favourites" data-nav="favourites">♡ <span>Favourites</span><span id="favourite-count" class="count" hidden></span></a><a href="#history" data-nav="history">↺ <span>History</span></a></nav>
+    <button class="icon-button help-button" data-action="help" aria-label="About and install the app">?</button>
+  </header>
+  <main id="main" tabindex="-1"></main>
+  <footer class="site-footer"><span>Made for moments together.</span><button class="text-button" data-action="help">A little about us →</button></footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="dialog" aria-labelledby="dialog-title"></dialog>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
